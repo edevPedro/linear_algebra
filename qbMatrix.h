@@ -10,7 +10,7 @@ public:
     qbMatrix2(int nRows, int nCols, const T *inputData);
     qbMatrix2(const qbMatrix2<T>& inputMatrix);
 
-    // Destructor
+ 
     ~qbMatrix2();
 
     // Configuration methods
@@ -265,8 +265,33 @@ THE * OPERATOR
 // matrix * matrix
 template <class T>
 qbMatrix2<T> operator* (const qbMatrix2<T>& lhs, const qbMatrix2<T>& rhs){
-  int numRows = lhs.m_nRows;
-  int numCols = rhs.m_nCols;
+  int l_numRows = lhs.m_nRows;
+  int l_numCols = lhs.m_nCols;
+  int r_numRows = rhs.m_nRows;
+  int r_numCols = rhs.m_nCols;
+  if (l_numCols == r_numRows){
+    T *tempResult = new T[lhs.m_nRows * rhs.m_nCols];
+
+    for (int lhsRow=0; lhsRow<l_numRows; lhsRow++){
+      for (int rhsCol=0; rhsCol<r_numCols; rhsCol++){
+        T elementResult = 0.0;
+        for (int lhsCol=0; lhsCol<l_numCols; lhsCol++){
+          // Compute the LHS linear index
+          int lhsLinearIndex = (lhsRow * l_numCols) + lhsCol;
+
+          // Compute the RHS linear index (based on LHS col)
+          // rhs row number equal lhs column number
+          int rhsLinearIndex = (lhsCol * r_numCols) + rhsCol;
+
+          // Performance calculation on these elements
+          elementResult += (lhs.m_matrixData[lhsLinearIndex] * rhs.m_matrixData[rhsLinearIndex]);
+        }
+        // Store the result
+
+      }
+    }
+  }
+
   int numElements = numRows * numCols;
   T *tempResult = new T[numElements];
   for (int i=0; i<numRows; ++i){
@@ -306,5 +331,13 @@ qbMatrix2<T> operator* (const T& lhs, const qbMatrix2<T>& rhs){
   delete[] tempResult;
   return result;
 }
+
+/*********************************
+THE / OPERATOR
+**********************************/
+
+// matrix / matrix
+template <class T>
+
 
 #endif
