@@ -1,6 +1,12 @@
 #ifndef QBMATRIX2_H
 #define QBMATRIX2_H
 
+#include <iostream>
+#include <stdexcept>
+#include <iomanip>
+#include <math.h>
+#include <vector>
+
 template <class T>
 class qbMatrix2 {
 public:
@@ -9,8 +15,8 @@ public:
     qbMatrix2(int nRows, int nCols);
     qbMatrix2(int nRows, int nCols, const T *inputData);
     qbMatrix2(const qbMatrix2<T>& inputMatrix);
+    qbMatrix2(int nRows, int nCols, const std::vector<T>& inputData);
 
- 
     ~qbMatrix2();
 
     // Configuration methods
@@ -90,6 +96,18 @@ qbMatrix2<T>::qbMatrix2(const qbMatrix2<T>& inputMatrix){
   m_matrixData = new T[m_nElements];
   for (int i=0; i<m_nElements; i++){
     m_matrixData[i] = inputMatrix.m_matrixData[i];
+  }
+}
+
+// Construct from std::vector
+template <class T>
+qbMatrix2<T>::qbMatrix2(int nRows, int nCols, const std::vector<T>& inputData){
+  m_nRows = nRows;
+  m_nCols = nCols;
+  m_nElements = nRows * nCols;
+  m_matrixData = new T[m_nElements];
+  for (int i=0; i<m_nElements; ++i){
+    m_matrixData[i] = inputData->at(i);
   }
 }
 
@@ -287,50 +305,49 @@ qbMatrix2<T> operator* (const qbMatrix2<T>& lhs, const qbMatrix2<T>& rhs){
           elementResult += (lhs.m_matrixData[lhsLinearIndex] * rhs.m_matrixData[rhsLinearIndex]);
         }
         // Store the result
-
+        int resultLinearIndex = (lhsRow * r_numCols) + rhsCol;
+        tempResult[resultLinearIndex] = elementResult;
       }
     }
+    qbMatrix2<T> result(l_numRows, r_numCols, tempResult);
+    delete[] tempResult;
+    return result;
   }
-
-  int numElements = numRows * numCols;
-  T *tempResult = new T[numElements];
-  for (int i=0; i<numRows; ++i){
-    tempResult[i] = lhs * rhs.m_matrixData[i];
+  else {
+    qbMatrix2<T> result(1, 1);
+    return result;
   }
-  qbMatrix2<T> result(numRows, numCols, tempResult);
-  delete[] tempResult;
-  return result;
 }
 
 // matrix * scaler
-template <class T>
-qbMatrix2<T> operator* (const qbMatrix2<T>& lhs, const T& rhs){
-  int numRows = lhs.m_nRows;
-  int numCols = lhs.m_nCols;
-  int numElements = numRows * numCols;
-  T *tempResult = new T[numElements];
-  for (int i=0; i<numElements; ++i){
-    tempResult[i] = lhs.m_matrixData[i] * rhs;
-  }
-  qbMatrix2<T> result(numRows, numCols, tempResult);
-  delete[] tempResult;
-  return result;
-}
+// template <class T>
+// qbMatrix2<T> operator* (const qbMatrix2<T>& lhs, const T& rhs){
+//   int numRows = lhs.m_nRows;
+//   int numCols = lhs.m_nCols;
+//   int numElements = numRows * numCols;
+//   T *tempResult = new T[numElements];
+//   for (int i=0; i<numElements; ++i){
+//     tempResult[i] = lhs.m_matrixData[i] * rhs;
+//   }
+//   qbMatrix2<T> result(numRows, numCols, tempResult);
+//   delete[] tempResult;
+//   return result;
+// }
 
-// scaler * matrix
-template <class T>
-qbMatrix2<T> operator* (const T& lhs, const qbMatrix2<T>& rhs){
-  int numRows = rhs.m_nRows;
-  int numCols = rhs.m_nCols;
-  int numElements = numRows * numCols;
-  T *tempResult = numRows * numCols;
-  for (int i=0; i<numElements; ++i){
-    tempResult[i] = lhs * rhs.m_matrixData[i];
-  }
-  qbMatrix2<T> result(numRows, numCols, tempResult);
-  delete[] tempResult;
-  return result;
-}
+// // scaler * matrix
+// template <class T>
+// qbMatrix2<T> operator* (const T& lhs, const qbMatrix2<T>& rhs){
+//   int numRows = rhs.m_nRows;
+//   int numCols = rhs.m_nCols;
+//   int numElements = numRows * numCols;
+//   T *tempResult = numRows * numCols;
+//   for (int i=0; i<numElements; ++i){
+//     tempResult[i] = lhs * rhs.m_matrixData[i];
+//   }
+//   qbMatrix2<T> result(numRows, numCols, tempResult);
+//   delete[] tempResult;
+//   return result;
+// }
 
 /*********************************
 THE / OPERATOR
@@ -338,6 +355,19 @@ THE / OPERATOR
 
 // matrix / matrix
 template <class T>
+qbMatrix2<T> operator/ (const qbMatrix2<T>& lhs, const qbMatrix2<T>& rhs){
+  int numRows = lhs.m_nRows;
+  int numCols = lhs.m_nCols;
+  int numElements = numRows * numCols;
+  T *tempResult = new T[numElements];
+  for (int i=0; i<numElements; ++i){
+    tempResult[i] = lhs.m_matrixData[i] / rhs.m_matrixData[i];
+  }
+  qbMatrix2<T> result(numRows, numCols, tempResult);
+  delete[] tempResult;
+  return result;
+}
+
 
 
 #endif
