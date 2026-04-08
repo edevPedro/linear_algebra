@@ -21,11 +21,11 @@ void PrintMatrix(qbMatrix2<T> matrix) {
 int main(){
   cout << "Code to test qbMatrix2" << endl;
 
-  double simpleData[12] = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 11.0, 12.0};
+  double simpleData[12] = {1.0, 2.0, 3.0, 1.0, 2.0, 3.0, 1.0, 2.0, 3.0, 1.0, 2.0, 3.0};
   qbMatrix2<double> testMatrix(3, 4, simpleData);
 
   cout << endl << "**************************" << endl;
-  cout << "3x4 matrix test (testMatrix)" << endl;
+  cout << "4x3 matrix test (testMatrix)" << endl;
   PrintMatrix(testMatrix);
 
   cout << endl << "**************************" << endl;
@@ -37,24 +37,8 @@ int main(){
   }
 
   cout << endl << "**************************" << endl;
-  cout << "Element set test" << endl;
-  testMatrix.setElement(0, 0, 99.0);
-  cout << "After setting (0,0) to 99.0:" << endl;
-  PrintMatrix(testMatrix);
-
-  cout << endl << "**************************" << endl;
-  cout << "Copy constructor test" << endl;
-  qbMatrix2<double> copyMatrix(testMatrix);
-  PrintMatrix(copyMatrix);
-
-  cout << endl << "**************************" << endl;
-  cout << "Resize test" << endl;
-  copyMatrix.resize(2, 2);
-  PrintMatrix(copyMatrix);
-
-  cout << endl << "**************************" << endl;
   cout << "Matrix addition test" << endl;
-  qbMatrix2<double> testMatrix2(3, 4, simpleData);
+  qbMatrix2<double> testMatrix2(4, 3, simpleData);
   qbMatrix2<double> sumMatrix = testMatrix + testMatrix2;
   PrintMatrix(sumMatrix);
 

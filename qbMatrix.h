@@ -19,14 +19,16 @@ public:
 
     ~qbMatrix2();
 
+    const T* data() const { return m_matrixData; }
+
     // Configuration methods
     bool resize(int numRows, int numCols);
 
     // Element access methods
     T GetElement(int row, int col);
     bool setElement(int row, int col, T elementValue);
-    int getNumRows();
-    int getNumCols();
+    int getNumRows() const;
+    int getNumCols() const;
 
     // Overload == operator
     bool operator== (const qbMatrix2<T>& rhs);
@@ -174,12 +176,12 @@ bool qbMatrix2<T>::setElement(int row, int col, T elementValue){
 }
 
 template <class T>
-int qbMatrix2<T>::getNumRows(){
+int qbMatrix2<T>::getNumRows() const{
   return m_nRows;
 }
 
 template <class T>
-int qbMatrix2<T>::getNumCols(){
+int qbMatrix2<T>::getNumCols() const{
   return m_nCols;
 }
 
@@ -196,7 +198,7 @@ THE + OPERATOR
 template <class T>
 qbMatrix2<T> operator+ (const qbMatrix2<T>& lhs, const qbMatrix2<T>& rhs){
  int numRows = lhs.m_nRows;
- int numCols = lhs.m_nColsRows;
+ int numCols = lhs.m_nCols;
  int numElements = numRows * numCols;
  T *tempResult = new T[numElements];
  for (int i; i<numElements; i++){
@@ -330,6 +332,38 @@ qbMatrix2<T> operator* (const qbMatrix2<T>& lhs, const qbMatrix2<T>& rhs){
   }
 }
 
+
+// matrix * scaler
+template <class T>
+qbMatrix2<T> operator* (const qbMatrix2<T>& lhs, const T& rhs){
+  int numRows = lhs.getNumRows();
+  int numCols = lhs.getNumCols();
+  int numElements = numRows * numCols;
+  T *tempResult = new T[numElements];
+  for (int i=0; i<numElements; ++i){
+    tempResult[i] = lhs.m_matrixData[i] * rhs;
+  }
+  qbMatrix2<T> result(numRows, numCols, tempResult);
+  delete[] tempResult;
+  return result;
+}
+
+// scaler * matrix
+template <class T>
+qbMatrix2<T> operator* (const T& lhs, const qbMatrix2<T>& rhs){
+  int numRows = rhs.getNumRows();
+  int numCols = rhs.getNumCols();
+  int numElements = numRows * numCols;
+  T *tempResult = new T[numElements];
+  for (int i=0; i<numElements; ++i){
+    tempResult[i] = lhs * rhs.m_matrixData[i];
+  }
+  qbMatrix2<T> result(numRows, numCols, tempResult);
+  delete[] tempResult;
+  return result;
+}
+
+
 /*********************************
 THE == OPERATOR
 **********************************/
@@ -350,36 +384,6 @@ bool qbMatrix2<T>::operator==(const qbMatrix2<T>& rhs){
   return flag;
 }
 
-// matrix * scaler
-template <class T>
-qbMatrix2<T> operator* (const qbMatrix2<T>& lhs, const T& rhs){
-  int numRows = lhs.m_nRows;
-  int numCols = lhs.m_nCols;
-  int numElements = numRows * numCols;
-  T *tempResult = new T[numElements];
-  for (int i=0; i<numElements; ++i){
-    tempResult[i] = lhs.m_matrixData[i] * rhs;
-  }
-  qbMatrix2<T> result(numRows, numCols, tempResult);
-  delete[] tempResult;
-  return result;
-}
-
-// scaler * matrix
-template <class T>
-qbMatrix2<T> operator* (const T& lhs, const qbMatrix2<T>& rhs){
-  int numRows = rhs.m_nRows;
-  int numCols = rhs.m_nCols;
-  int numElements = numRows * numCols;
-  T *tempResult = numRows * numCols;
-  for (int i=0; i<numElements; ++i){
-    tempResult[i] = lhs * rhs.m_matrixData[i];
-  }
-  qbMatrix2<T> result(numRows, numCols, tempResult);
-  delete[] tempResult;
-  return result;
-}
-
 /*********************************
 THE / OPERATOR
 **********************************/
@@ -387,12 +391,14 @@ THE / OPERATOR
 // matrix / matrix
 template <class T>
 qbMatrix2<T> operator/ (const qbMatrix2<T>& lhs, const qbMatrix2<T>& rhs){
-  int numRows = lhs.m_nRows;
-  int numCols = lhs.m_nCols;
+  int numRows = lhs.getNumRows();
+  int numCols = lhs.getNumCols();
   int numElements = numRows * numCols;
+  const T* lhsData = lhs.data();
+  const T* rhsData = rhs.data();
   T *tempResult = new T[numElements];
-  for (int i=0; i<numElements; ++i){
-    tempResult[i] = lhs.m_matrixData[i] / rhs.m_matrixData[i];
+  for (int i = 0; i < numElements; ++i){
+    tempResult[i] = lhsData[i] / rhsData[i];
   }
   qbMatrix2<T> result(numRows, numCols, tempResult);
   delete[] tempResult;
